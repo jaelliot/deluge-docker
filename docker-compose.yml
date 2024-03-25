@@ -19,7 +19,7 @@ services:
         source: /mnt/d/Downloads/deluge/logs
         target: /config/logs
     ports:
-      - 8112:8112
+      - 8120:8112
       - 6881:6881
       - 6881:6881/udp
       - 58846:58846
