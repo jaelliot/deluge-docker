@@ -10,22 +10,31 @@ services:
       - DELUGE_LOGLEVEL=error #optional
     volumes:
       - type: bind
-        source: /d/Downloads/deluge/config
+        source: /mnt/d/Downloads/deluge/config
         target: /config
       - type: bind
-        source: /d/Downloads/deluge/downloads
+        source: /mnt/d/Downloads/deluge/downloads
         target: /downloads
+      - type: bind
+        source: /mnt/d/Downloads/deluge/logs
+        target: /config/logs
     ports:
       - 8112:8112
       - 6881:6881
       - 6881:6881/udp
-      - 58846:58846 #optional
+      - 58846:58846
     restart: unless-stopped
     deploy:
       resources:
         limits:
           cpus: '2.0'
-          memory: 2048M
+          memory: 4096M
         reservations:
           cpus: '0.5'
           memory: 1024M
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:8112 || exit 1"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 5m
