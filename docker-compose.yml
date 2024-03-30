@@ -4,25 +4,39 @@ services:
     image: lscr.io/linuxserver/deluge:latest
     container_name: deluge
     environment:
-      - PUID=1000 # Adjust according to your host's user ID
-      - PGID=1000 # Adjust according to your host's group ID
-      - TZ=America/Los_Angeles
-      - DELUGE_LOGLEVEL=error #optional
+      - PUID=1000 # Your user ID
+      - PGID=1000 # Your group ID
+      - TZ=America/Los_Angeles # Your timezone
+      - DELUGE_LOGLEVEL=error # Use 'debug' for more logs
     volumes:
+      # SSD (J: drive) Volumes for Performance
       - type: bind
-        source: /mnt/d/Downloads/deluge/config
+        source: /mnt/j/deluge/config
         target: /config
       - type: bind
-        source: /mnt/d/Downloads/deluge/downloads
-        target: /downloads
+        source: /mnt/j/deluge/cache
+        target: /config/cache
       - type: bind
-        source: /mnt/d/Downloads/deluge/logs
-        target: /config/logs
+        source: /mnt/j/deluge/active
+        target: /downloads/active
+      - type: bind
+        source: /mnt/j/deluge/torrents
+        target: /config/torrents
+  
+     # Separate AutoAdd Watch Folder on SSD (J: drive)
+      - type: bind
+        source: /mnt/j/deluge/autoadd
+        target: /config/autoadd
+
+      # HDD (D: drive) Volume for Storage
+      - type: bind
+        source: /mnt/d/Downloads/deluge/completed
+        target: /downloads/completed
     ports:
-      - 8120:8112
-      - 6881:6881
-      - 6881:6881/udp
-      - 58846:58846
+      - "8120:8112" # Selected to avoid Microsoft-reserved ports
+      - "6881:6881"
+      - "6881:6881/udp"
+      - "58846:58846"
     restart: unless-stopped
     deploy:
       resources:
@@ -38,3 +52,8 @@ services:
       timeout: 10s
       retries: 3
       start_period: 5m
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
